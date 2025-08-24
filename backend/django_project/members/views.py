@@ -19,8 +19,9 @@ def members(request):
             return JsonResponse({"message": "POST request denied, user already exists"})
         token=uuid.uuid4()
         Member.objects.create(
+            name = data["name"],
+            surname = data["surname"],
             email = data["email"],
-            date_of_subscription = data["date_of_subscription"],
             password=make_password(data["password"]),
             is_confirmed = False,
             confirmation_token = token,

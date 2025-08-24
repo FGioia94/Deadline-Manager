@@ -2,22 +2,17 @@
 import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { getCookie } from "../assets/utilities/token";
-
-class LoginForm extends Rect.Component{
-
-    
-}
-
-
-class AddTaskForm extends React.Component {
+class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
-    this.taskNameRef = React.createRef();
-    this.state = { selectedDepartment: "" };
+    this.nameRef = React.createRef();
+    this.surnameRef = React.createRef();
+    this.emailRef = React.createRef();
+    this.passwordRef = React.createRef();
   }
+
   handleSubmit = async (e) => {
     e.preventDefault();
-    const selectedDepartment = this.state.selectedDepartment;
 
     await fetch("http://localhost:8000/csrf/", {
       method: "GET",
@@ -27,35 +22,32 @@ class AddTaskForm extends React.Component {
     const csrfToken = getCookie("csrftoken");
     console.log("CSRF Token:", csrfToken);
 
-    fetch("http://localhost:8000/tasks/", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-      },
-      body: JSON.stringify({
-        name: this.taskNameRef.current.value,
-
-        department: selectedDepartment,
-        artist: "",
-        deadline: "",
-        status: "",
-        asset: "",
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Request Error");
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Asset Created Successfully:", data);
-        this.props.onClose();
-      })
-      .catch((err) => {
-        console.error("Error:", err);
+    try {
+      const res = await fetch("http://localhost:8000/members/", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({
+          name: this.nameRef.current.value,
+          surname: this.surnameRef.current.value,
+          email: this.emailRef.current.value,
+          password: this.passwordRef.current.value,
+        }),
       });
+
+      if (!res.ok) throw new Error("Request Error");
+
+      const data = await res.json();
+      console.log("Asset Created Successfully:", data);
+      this.props.onClose();
+    } catch (err) {
+      console.error("Error:", err);
+    }
   };
+
   render() {
     const { isOpen, onClose, children } = this.props;
 
@@ -72,32 +64,32 @@ class AddTaskForm extends React.Component {
 
         <Form onSubmit={this.handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Task Name</Form.Label>
+            <Form.Label>Name</Form.Label>
+            <Form.Control type="text" placeholder="Name" ref={this.nameRef} />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Surname</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Task Name"
-              ref={this.taskNameRef}
+              placeholder="Surname"
+              ref={this.surnameRef}
             />
           </Form.Group>
-          <Form.Group controlId="departmentSelect">
-            <Form.Label>Department</Form.Label>
-            <Form.Select
-              value={this.state.selectedDepartment}
-              onChange={(e) => this.setState({ selectedDepartment: e.target.value })}
-            >
-              <option value="">-- Choose Department --</option>
-              <option value="modeling">Modeling</option>
-              <option value="texturing">Texturing</option>
-              <option value="rigging">Rigging</option>
-              <option value="lookdev">Lookdev</option>
-              <option value="grooming">Grooming</option>
-              <option value="animation">Animation</option>
-              <option value="fx">FX</option>
-              <option value="cfx-muscle">CFX Muscle</option>
-              <option value="cfx-hair">CFX Hair</option>
-              <option value="lighting">Lighting</option>
-              <option value="pipeline">Pipeline</option>
-            </Form.Select>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="Email"
+              ref={this.emailRef}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              ref={this.passwordRef}
+            />
           </Form.Group>
           <Button variant="primary" type="submit">
             Submit
@@ -107,5 +99,3 @@ class AddTaskForm extends React.Component {
     );
   }
 }
-
-export default AddTaskForm;
