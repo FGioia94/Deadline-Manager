@@ -5,6 +5,7 @@ import { Form, Button } from "react-bootstrap";
 const TaskCard = ({
   task,
   members,
+  idData,
   artistFilter = "all",
   assetFilter = "all",
 }) => {
@@ -14,10 +15,12 @@ const TaskCard = ({
   ) {
     return <></>;
   }
+
   const deadline = new Date(task.deadline);
   const now = new Date();
   const timeDiff = deadline - now;
   const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
   let urgencyClass = "";
   if (daysDiff < 0) {
     urgencyClass = "overdue";
@@ -33,11 +36,13 @@ const TaskCard = ({
 
   const dateRef = useRef();
   const artistRef = useRef();
+  const passwordRef = useRef();
+
   const [date, setDate] = useState("");
   const [artist, setArtist] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const passwordRef = useRef();
   const [password, setPassword] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [affectScore, setAffectScore] = useState(false);
 
   const getCookie = (name) => {
     let cookieValue = null;
@@ -77,9 +82,23 @@ const TaskCard = ({
     alert("Update successful! Reload to see changes.");
   };
 
+  const updateScore = async (id, scoreChange) => {
+    const csrfToken = getCookie("csrftoken");
+
+    await fetch(`http://localhost:8000/members/${id}/`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({ score: scoreChange }),
+    });
+  };
+
   const handleDeadlineSubmit = async (e) => {
     e.preventDefault();
-    if (passwordRef.current.value !== "ADMIN2025Moonshot_") {
+    if (passwordRef.current.value !== "") {
       alert("Incorrect password");
       return;
     }
@@ -90,14 +109,28 @@ const TaskCard = ({
       console.error("Deadline update failed:", err);
     }
   };
-  const deleteTask = async () => {
-    if (passwordRef.current.value !== "ADMIN2025Moonshot_") {
+
+  const handleArtistSubmit = async (e) => {
+    e.preventDefault();
+    if (passwordRef.current.value !== "") {
       alert("Incorrect password");
       return;
     }
-    const confirmed = window.confirm(
-      "Sei sicuro di voler eliminare questo task?"
-    );
+
+    try {
+      await patchTask({ name: task.name, artist: artistRef.current.value });
+    } catch (err) {
+      console.error("Artist update failed:", err);
+    }
+  };
+
+  const deleteTask = async () => {
+    if (passwordRef.current.value !== "") {
+      alert("Incorrect password");
+      return;
+    }
+
+    const confirmed = window.confirm("Are you sure?");
     if (!confirmed) return;
 
     await fetch("http://localhost:8000/csrf/", {
@@ -106,6 +139,7 @@ const TaskCard = ({
     });
 
     const csrfToken = getCookie("csrftoken");
+
     const res = await fetch(`http://localhost:8000/tasks/?name=${task.name}`, {
       method: "DELETE",
       credentials: "include",
@@ -120,21 +154,29 @@ const TaskCard = ({
       return;
     }
 
-    alert("Task deleted!.");
-    window.location.reload();
-  };
-  const handleArtistSubmit = async (e) => {
-    e.preventDefault();
-    if (passwordRef.current.value !== "ADMIN2025Moonshot_") {
-      alert("Incorrect password");
-      return;
+    if (affectScore) {
+      const deadlineDate = new Date(task.deadline);
+      const today = new Date();
+      const todayStr = today.toISOString().split("T")[0];
+      const deadlineStr = deadlineDate.toISOString().split("T")[0];
+
+      let scoreChange = 0;
+      if (todayStr < deadlineStr) {
+        scoreChange = 1;
+      } else if (todayStr > deadlineStr) {
+        scoreChange = -1;
+      } else {
+        scoreChange = 0.5;
+      }
+      console.log(task);
+      const id = idData[task.artist];
+      console.log(task.artist);
+      console.log(id);
+      await updateScore(id, scoreChange);
     }
 
-    try {
-      await patchTask({ name: task.name, artist: artistRef.current.value });
-    } catch (err) {
-      console.error("Artist update failed:", err);
-    }
+    alert("Task deleted!");
+    window.location.reload();
   };
 
   return (
@@ -154,10 +196,7 @@ const TaskCard = ({
 
       {isOpen && (
         <div className="card-body">
-          {/* Deadline Form */}
-
           <Form onSubmit={handleDeadlineSubmit}>
-            {/* Shared Password Field */}
             <Form.Group controlId="formPassword">
               <Form.Label>Enter Password</Form.Label>
               <Form.Control
@@ -184,7 +223,6 @@ const TaskCard = ({
             </Button>
           </Form>
 
-          {/* Artist Form */}
           <Form onSubmit={handleArtistSubmit} className="mt-4">
             <Form.Group controlId="formArtist">
               <Form.Label>Update Artist</Form.Label>
@@ -195,19 +233,27 @@ const TaskCard = ({
                 required
               >
                 <option value="">Select an artist</option>
-                {members.map((member, index) => {
-                  return (
-                    <option key={index} value={member}>
-                      {member}
-                    </option>
-                  );
-                })}
+                {members.map((member, index) => (
+                  <option key={index} value={member}>
+                    {member}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
             <Button variant="info" type="submit" className="mt-2">
               Update Artist
             </Button>
           </Form>
+
+          <Form.Group controlId="formAffectScore" className="mt-3">
+            <Form.Check
+              type="checkbox"
+              label="Affect Score"
+              checked={affectScore}
+              onChange={(e) => setAffectScore(e.target.checked)}
+            />
+          </Form.Group>
+
           <Button variant="danger" className="mt-4" onClick={deleteTask}>
             🗑️ Task Completed
           </Button>

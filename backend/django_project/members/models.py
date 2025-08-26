@@ -7,3 +7,4 @@ class Member(models.Model):
   password = models.CharField(max_length=255, null=True)
   is_confirmed = models.BooleanField(default=False)
   confirmation_token = models.UUIDField(unique=True, null=True)
+  score = models.FloatField(default=0)

@@ -77,6 +77,7 @@ def tasks(request):
             if "artist" in data:
                 task.artist = data["artist"]
                 updated_fields.append(f"artist updated to {data['artist']}")
+                            
 
             if not updated_fields:
                 return JsonResponse({"error": "No valid fields to update"}, status=400)

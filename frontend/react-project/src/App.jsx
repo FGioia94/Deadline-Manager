@@ -44,7 +44,6 @@ function App() {
         const response = await fetch("http://127.0.0.1:8000/members/");
         const data = await response.json();
         setMembers(data);
-        console.log("Fetched Members:", data);
       } catch (error) {
         console.error("Error fetching members:", error);
       }
@@ -64,7 +63,9 @@ function App() {
           return task.artist.trim().toLowerCase();
         }
         if (task.artist && task.artist.name && task.artist.surname) {
-          return `${task.artist.name} ${task.artist.surname}`.trim().toLowerCase();
+          return `${task.artist.name} ${task.artist.surname}`
+            .trim()
+            .toLowerCase();
         }
         return "";
       })
@@ -76,13 +77,21 @@ function App() {
     });
 
     setUnassignedMembers(unassigned);
-    console.log("Unassigned Members:", unassigned);
   }, [tasks, members]);
 
   const memberNames = [...members]
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((member) => `${member.name} ${member.surname}`);
 
+  const idList = [...members]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((member) => member.id);
+
+  const idDict = memberNames.reduce((acc, memberName, index) => {
+    acc[memberName] = idList[index];
+    return acc;
+  }, {});
+  console.log(idDict);
   return (
     <div className="App">
       <h1>Hello Francesco 👋</h1>
@@ -96,7 +105,12 @@ function App() {
 
       <div className="task-list">
         {tasks.map((task) => (
-          <TaskCard key={task.name} task={task} members={memberNames} />
+          <TaskCard
+            key={task.name}
+            task={task}
+            members={memberNames}
+            idData={idDict}
+          />
         ))}
       </div>
 
