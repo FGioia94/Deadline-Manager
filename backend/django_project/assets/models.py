@@ -19,7 +19,7 @@ class Task(models.Model):
         ('blocked', 'Blocked'),
     ]
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     department = models.CharField(max_length=255)
     artist = models.CharField(max_length=255, null=True, blank=True)
     deadline = models.DateField(null=True, blank=True)

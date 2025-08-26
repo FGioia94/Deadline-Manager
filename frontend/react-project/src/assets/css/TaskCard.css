@@ -1,0 +1,46 @@
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  cursor: pointer;
+  background-color: #f5f5f5;
+}
+
+.card-body {
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.task-card {
+  padding: 1rem;
+  margin: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease;
+}
+
+.task-card.overdue {
+  background-color: #0a0000; 
+}
+.task-card.today {
+  background-color: #ff0000; 
+}
+.task-card.urgent {
+  background-color: #ff8686; 
+}
+
+.task-card.soon {
+  background-color: #ffa723; 
+}
+
+.task-card.normal {
+  background-color: #f0f0f0; 
+}

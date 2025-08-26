@@ -58,3 +58,43 @@ def tasks(request):
             ) 
         return JsonResponse({"message": f"Task {data["name"]} Created"})
     
+    elif request.method == "PATCH":
+        data = json.loads(request.body)
+        task_name = data.get("name")
+
+        if not task_name:
+            return JsonResponse({"error": "Missing 'name' in request"}, status=400)
+
+        try:
+            task = Task.objects.get(name=task_name)
+
+            updated_fields = []
+
+            if "deadline" in data:
+                task.deadline = data["deadline"]
+                updated_fields.append(f"deadline updated to {data['deadline']}")
+
+            if "artist" in data:
+                task.artist = data["artist"]
+                updated_fields.append(f"artist updated to {data['artist']}")
+
+            if not updated_fields:
+                return JsonResponse({"error": "No valid fields to update"}, status=400)
+
+            task.save()
+            return JsonResponse({"message": f"Task '{task_name}' updated: " + ", ".join(updated_fields)})
+
+        except Task.DoesNotExist:
+            return JsonResponse({"error": f"Task '{task_name}' not found"}, status=404)
+    elif request.method == "DELETE":
+        task_name = request.GET.get("name")
+
+        if not task_name:
+            return JsonResponse({"error": "Missing 'name' query parameter"}, status=400)
+
+        try:
+            task = Task.objects.get(name=task_name)
+            task.delete()
+            return JsonResponse({"message": f"Task '{task_name}' deleted successfully"})
+        except Task.DoesNotExist:
+            return JsonResponse({"error": f"Task '{task_name}' not found"}, status=404)

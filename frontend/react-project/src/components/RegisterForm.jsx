@@ -41,7 +41,6 @@ class RegisterForm extends React.Component {
       if (!res.ok) throw new Error("Request Error");
 
       const data = await res.json();
-      console.log("Asset Created Successfully:", data);
       this.props.onClose();
     } catch (err) {
       console.error("Error:", err);
@@ -99,3 +98,5 @@ class RegisterForm extends React.Component {
     );
   }
 }
+
+export default RegisterForm

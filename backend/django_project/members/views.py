@@ -11,7 +11,9 @@ from django.shortcuts import get_object_or_404
 def members(request):
     
     if request.method == "GET":
-        return Member.objects.all()
+        members = list(Member.objects.values())
+        return JsonResponse(members, safe=False)
+
     
     elif request.method == "POST":
         data = json.loads(request.body)
