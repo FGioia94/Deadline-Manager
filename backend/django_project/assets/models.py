@@ -29,4 +29,5 @@ class Task(models.Model):
     added_by = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.name} ({self.department})"
+        return self.name
+

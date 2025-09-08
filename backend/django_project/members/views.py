@@ -53,7 +53,7 @@ def member_detail(request, member_id):
 
         if "score" in data:
             try:
-                member.score += int(data["score"])
+                member.score += float(data["score"])
                 updated_fields.append(f"score updated to {member.score}")
             except (TypeError, ValueError):
                 return JsonResponse({"error": "Invalid score value"}, status=400)

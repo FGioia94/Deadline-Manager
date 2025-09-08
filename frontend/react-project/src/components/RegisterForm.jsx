@@ -2,6 +2,7 @@
 import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { getCookie } from "../assets/utilities/token";
+
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
@@ -14,15 +15,27 @@ class RegisterForm extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:8000/csrf/", {
-      method: "GET",
-      credentials: "include",
-    });
+    const name = this.nameRef.current.value.trim();
+    const surname = this.surnameRef.current.value.trim();
+    const email = this.emailRef.current.value.trim();
+    const password = this.passwordRef.current.value;
 
-    const csrfToken = getCookie("csrftoken");
-    console.log("CSRF Token:", csrfToken);
+    // Require password to be exactly "aaaa"
+    if (password !== "aaaa") {
+      alert("Wrong Password.");
+      return;
+    }
 
     try {
+      // Get CSRF token
+      await fetch("http://localhost:8000/csrf/", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const csrfToken = getCookie("csrftoken");
+
+      // Submit registration
       const res = await fetch("http://localhost:8000/members/", {
         method: "POST",
         credentials: "include",
@@ -31,19 +44,21 @@ class RegisterForm extends React.Component {
           "X-CSRFToken": csrfToken,
         },
         body: JSON.stringify({
-          name: this.nameRef.current.value,
-          surname: this.surnameRef.current.value,
-          email: this.emailRef.current.value,
-          password: this.passwordRef.current.value,
+          name,
+          surname,
+          email,
+          password,
         }),
       });
 
       if (!res.ok) throw new Error("Request Error");
 
       const data = await res.json();
+      console.log("Registration successful:", data);
       this.props.onClose();
     } catch (err) {
       console.error("Error:", err);
+      alert("Registration failed. Please try again.");
     }
   };
 
@@ -68,27 +83,23 @@ class RegisterForm extends React.Component {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Surname</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Surname"
-              ref={this.surnameRef}
-            />
+            <Form.Control type="text" placeholder="Surname" ref={this.surnameRef} />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              ref={this.emailRef}
-            />
+            <Form.Control type="email" placeholder="Email" ref={this.emailRef} />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>
+              Password <span style={{ color: "red" }}>*</span>
+            </Form.Label>
             <Form.Control
               type="password"
               placeholder="Password"
               ref={this.passwordRef}
+              required
             />
+
           </Form.Group>
           <Button variant="primary" type="submit">
             Submit
@@ -99,4 +110,4 @@ class RegisterForm extends React.Component {
   }
 }
 
-export default RegisterForm
+export default RegisterForm;

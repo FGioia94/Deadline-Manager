@@ -1,45 +1,60 @@
+// AddAssetForm.jsx
 import React from "react";
 import { Form, Button } from "react-bootstrap";
 import { getCookie } from "../assets/utilities/token";
+import "../assets/css/AddAssetForm.css";
 
 class AddAssetForm extends React.Component {
   constructor(props) {
     super(props);
     this.assetNameRef = React.createRef();
+    this.passwordRef = React.createRef();
   }
 
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:8000/csrf/", {
-      method: "GET",
-      credentials: "include",
-    });
+    const assetName = this.assetNameRef.current.value.trim();
+    const password = this.passwordRef.current.value;
 
-    const csrfToken = getCookie("csrftoken");
-    console.log("CSRF Token:", csrfToken);
+    // Validate password only
+    if (password !== "aaaa") {
+      alert("Wrong Password");
+      return;
+    }
 
-    fetch("http://localhost:8000/assets/", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-      },
-      body: JSON.stringify({ name: this.assetNameRef.current.value }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Request Error");
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Asset Created Successfully:", data);
-        this.props.onClose();
-      })
-      .catch((err) => {
-        console.error("Error:", err);
+    try {
+      // Fetch CSRF token
+      await fetch("http://localhost:8000/csrf/", {
+        method: "GET",
+        credentials: "include",
       });
+
+      const csrfToken = getCookie("csrftoken");
+      console.log("CSRF Token:", csrfToken);
+
+      // Submit asset
+      const res = await fetch("http://localhost:8000/assets/", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ name: assetName, password }),
+      });
+
+      if (!res.ok) throw new Error("Request Error");
+
+      const data = await res.json();
+      console.log("Asset Created Successfully:", data);
+      this.props.onClose();
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Failed to create asset. Please try again.");
+    }
   };
+
   render() {
     const { isOpen, onClose, children } = this.props;
 
@@ -61,8 +76,21 @@ class AddAssetForm extends React.Component {
               type="text"
               placeholder="Asset Name"
               ref={this.assetNameRef}
+              required
             />
           </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Password"
+              ref={this.passwordRef}
+              required
+            />
+
+          </Form.Group>
+
           <Button variant="primary" type="submit">
             Submit
           </Button>
