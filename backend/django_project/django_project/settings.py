@@ -23,10 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-wm^49_z467tnvp9jtol=7r+2v^$(+ogolj_x^qjgie+=*m87#8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['MoonshotCGI.pythonanywhere.com']
 
 # Application definition
 
@@ -140,7 +139,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = 'static/'
 
 # Default primary key field type
