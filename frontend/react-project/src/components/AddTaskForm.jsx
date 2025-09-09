@@ -21,7 +21,7 @@ class AddTaskForm extends React.Component {
 
   componentDidMount() {
     // Fetch assets
-    fetch("http://localhost:8000/assets/")
+    fetch("https://moonshotcgi.pythonanywhere.com/assets/")
       .then((res) => res.json())
       .then((data) => {
         this.setState({ assets: data });
@@ -31,7 +31,7 @@ class AddTaskForm extends React.Component {
       });
 
     // Fetch artists
-    fetch("http://localhost:8000/members/")
+    fetch("https://moonshotcgi.pythonanywhere.com/members/")
       .then((res) => res.json())
       .then((data) => {
         const fullNames = data.map((member) => `${member.name} ${member.surname}`);
@@ -65,14 +65,14 @@ class AddTaskForm extends React.Component {
       return;
     }
 
-    await fetch("http://localhost:8000/csrf/", {
+    await fetch("https://moonshotcgi.pythonanywhere.com/csrf/", {
       method: "GET",
       credentials: "include",
     });
 
     const csrfToken = getCookie("csrftoken");
 
-    fetch("http://localhost:8000/tasks/", {
+    fetch("https://moonshotcgi.pythonanywhere.com/tasks/", {
       method: "POST",
       credentials: "include",
       headers: {

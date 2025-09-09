@@ -28,7 +28,7 @@ class RegisterForm extends React.Component {
 
     try {
       // Get CSRF token
-      await fetch("http://localhost:8000/csrf/", {
+      await fetch("https://moonshotcgi.pythonanywhere.com/csrf/", {
         method: "GET",
         credentials: "include",
       });
@@ -36,7 +36,7 @@ class RegisterForm extends React.Component {
       const csrfToken = getCookie("csrftoken");
 
       // Submit registration
-      const res = await fetch("http://localhost:8000/members/", {
+      const res = await fetch("https://moonshotcgi.pythonanywhere.com/members/", {
         method: "POST",
         credentials: "include",
         headers: {

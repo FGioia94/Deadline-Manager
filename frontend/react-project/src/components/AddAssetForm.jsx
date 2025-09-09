@@ -25,7 +25,7 @@ class AddAssetForm extends React.Component {
 
     try {
       // Fetch CSRF token
-      await fetch("http://localhost:8000/csrf/", {
+      await fetch("https://moonshotcgi.pythonanywhere.com/csrf/", {
         method: "GET",
         credentials: "include",
       });
@@ -34,7 +34,7 @@ class AddAssetForm extends React.Component {
       console.log("CSRF Token:", csrfToken);
 
       // Submit asset
-      const res = await fetch("http://localhost:8000/assets/", {
+      const res = await fetch("https://moonshotcgi.pythonanywhere.com/assets/", {
         method: "POST",
         credentials: "include",
         headers: {

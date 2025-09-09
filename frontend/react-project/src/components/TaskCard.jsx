@@ -53,12 +53,12 @@ const TaskCard = ({
   };
 
   const patchTask = async (payload) => {
-    await fetch("http://localhost:8000/csrf/", {
+    await fetch("https://moonshotcgi.pythonanywhere.com/csrf/", {
       method: "GET",
       credentials: "include",
     });
     const csrfToken = getCookie("csrftoken");
-    const res = await fetch("http://localhost:8000/tasks/", {
+    const res = await fetch("https://moonshotcgi.pythonanywhere.com/tasks/", {
       method: "PATCH",
       credentials: "include",
       headers: {
@@ -77,12 +77,12 @@ const TaskCard = ({
   };
 
   const updateScore = async (id, change) => {
-    await fetch("http://localhost:8000/csrf/", {
+    await fetch("https://moonshotcgi.pythonanywhere.com/csrf/", {
       method: "GET",
       credentials: "include",
     });
     const csrfToken = getCookie("csrftoken");
-    await fetch(`http://localhost:8000/members/${id}/`, {
+    await fetch(`https://moonshotcgi.pythonanywhere.com/members/${id}/`, {
       method: "PATCH",
       credentials: "include",
       headers: {
@@ -95,7 +95,7 @@ const TaskCard = ({
 
   const fetchTask = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/tasks/${task.id}/`);
+      const res = await fetch(`https://moonshotcgi.pythonanywhere.com/tasks/${task.id}/`);
       if (!res.ok) throw new Error("Task not found");
       const updatedTask = await res.json();
       setStatus(updatedTask.status);
@@ -189,14 +189,14 @@ const TaskCard = ({
       return;
     }
 
-    await fetch("http://localhost:8000/csrf/", {
+    await fetch("https://moonshotcgi.pythonanywhere.com/tasks/csrf/", {
       method: "GET",
       credentials: "include",
     });
     const csrfToken = getCookie("csrftoken");
 
     const res = await fetch(
-      `http://localhost:8000/tasks/?name=${encodeURIComponent(task.name)}`,
+      `https://moonshotcgi.pythonanywhere.com/tasks/?name=${encodeURIComponent(task.name)}`,
       {
         method: "DELETE",
         credentials: "include",
