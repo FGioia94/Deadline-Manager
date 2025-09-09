@@ -1,4 +1,4 @@
-{"homepage": "https://FGioia94.github.io/Deadline-Manager",
+{"homepage": "https://FGioia94.github.io/deadline-manager",
   "name": "react-project",
   "private": true,
   "version": "0.0.0",
@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist -r https://github.com/FGioia94/deadline-manager.git"
+
 
   },
   "dependencies": {
